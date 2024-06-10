@@ -3,6 +3,7 @@ todoLists = document.querySelector(".todo-list"),
 pendingNum = document.querySelector(".pending-num"),
 clearButton = document.querySelector(".clear-button");
 
+loadList();
 function allTasks() {
     let tasks = document.querySelectorAll(".pending");
     pendingNum.textContent = tasks.length === 0 ? "no" : tasks.length;
@@ -30,6 +31,7 @@ inputField.addEventListener("keyup", (e) => {
     inputField.value = "";
     };
     allTasks();
+    saveList();
 });
 
 function handleStatus(e) {
@@ -42,9 +44,35 @@ function handleStatus(e) {
 clearButton.addEventListener("click", () => {
     todoLists.innerHTML = "";
     allTasks();
+    saveList();
 });
 
 function deleteTask(e) {
     e.parentElement.remove();
     allTasks();
+    saveList();
+}
+
+function saveList() {
+    let tasks = document.querySelectorAll(".list");
+    let tasksArr = [];
+    tasks.forEach(task => {
+        tasksArr.push(task.querySelector(".task").textContent);
+    });
+    localStorage.setItem("tasksArr", JSON.stringify(tasksArr));
+}
+
+function loadList() {
+    let tasksArr = JSON.parse(localStorage.getItem("tasksArr"));
+    if (tasksArr) {
+        tasksArr.forEach(task => {
+            let liTag = `<li class="list pending" onclick="handleStatus(this)">
+                <input type="checkbox" />
+                <span class="task">${task}</span>
+                <i class="uil uil-trash" onclick="deleteTask(this)"></i>
+            </li>`;
+            todoLists.insertAdjacentHTML("beforeend", liTag);
+        });
+        allTasks();
+    }
 }
